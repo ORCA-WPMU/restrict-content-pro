@@ -726,7 +726,7 @@ function rcp_get_user_payments( $user_id = 0, $args = array() ) {
 }
 
 /**
- * Returns the role of the specified user
+ * Returns the name of the role for the specified user.
  *
  * @param int $user_id The ID of the user to get the role of
  *
@@ -749,7 +749,7 @@ function rcp_get_user_role( $user_id ) {
 		foreach ( $wp_roles->role_names as $role => $name ) {
 
 			if ( array_key_exists( $role, $capabilities ) ) {
-				$user_role = $role;
+				$user_role = $name;
 			}
 		}
 	}
