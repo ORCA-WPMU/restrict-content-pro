@@ -870,6 +870,10 @@ function rcp_settings_page() {
 									wp_editor( $active_email, 'rcp_settings_active_email', array( 'textarea_name' => 'rcp_settings[active_email]', 'teeny' => true ) );
 									?>
 									<p class="description"><?php _e( 'This is the email message that is sent to users when their subscription becomes active.', 'rcp' ); ?></p>
+									<p>
+										<a href="<?php echo esc_url( add_query_arg( array( 'rcp_action' => 'preview_email', 'rcp_email' => 'active_email' ), home_url() ) ); ?>" class="button-secondary" target="_blank"><?php _e( 'Preview Email', 'rcp' ); ?></a>
+										<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=rcp-settings&rcp-action=send_test_email&email=active' ), 'rcp_send_test_email' ) ); ?>" class="button-secondary"><?php _e( 'Send Test Email', 'rcp' ); ?></a>
+									</p>
 								</td>
 							</tr>
 							<tr>
@@ -1951,3 +1955,54 @@ function rcp_set_settings_cap() {
 	return 'rcp_manage_settings';
 }
 add_filter( 'option_page_capability_rcp_settings_group', 'rcp_set_settings_cap' );
+
+/**
+ * Send a test email
+ *
+ * @return void
+ */
+function rcp_process_send_test_email() {
+
+	if ( ! current_user_can( 'rcp_manage_settings' ) ) {
+		wp_die( __( 'You do not have permission to send test emails', 'rcp' ), __( 'Error', 'rcp' ), array( 'response' => 403 ) );
+	}
+
+	if ( ! wp_verify_nonce( $_GET['_wpnonce'], 'rcp_send_test_email' ) ) {
+		wp_die( __( 'Nonce verification failed', 'rcp' ), __( 'Error', 'rcp' ), array( 'response' => 401 ) );
+	}
+
+	if ( empty( $_GET['email'] ) ) {
+		wp_die( __( 'No email template was provided', 'rcp' ), __( 'Error', 'rcp' ), array( 'response' => 400 ) );
+	}
+
+	$current_user = wp_get_current_user();
+
+	rcp_log( sprintf( 'Sending test email template %s to user ID #%d.', sanitize_text_field( $_GET['email'] ), $current_user->ID ) );
+
+	global $rcp_options;
+
+	$subject = '';
+	$message = '';
+
+	switch( $_GET['email'] ) {
+		case 'active' :
+			$subject = $rcp_options['active_subject'];
+			$message = $rcp_options['active_email'];
+			break;
+	}
+
+	if ( empty( $subject ) || empty( $message ) ) {
+		wp_die( __( 'Test email not sent: email subject or message is blank.', 'rcp' ), __( 'Error', 'rcp' ), array( 'response' => 400 ) );
+	}
+
+	$emails            = new RCP_Emails();
+	$emails->member_id = $current_user->ID;
+
+	$emails->send( $current_user->user_email, $subject, $message );
+
+	wp_safe_redirect( admin_url( 'admin.php?page=rcp-settings&rcp_message=test_email_sent#emails' ) );
+	exit;
+
+}
+
+add_action( 'rcp_action_send_test_email', 'rcp_process_send_test_email' );

@@ -255,6 +255,12 @@ function rcp_admin_notices() {
 
 				$text = __( 'Test reminder sent successfully', 'rcp' );
 				break;
+
+			case 'test_email_sent' :
+
+				$current_user = wp_get_current_user();
+				$text         = sprintf( __( 'Test email sent successfully to %s', 'rcp' ), $current_user->user_email );
+				break;
 		}
 
 		if( $message ) {

@@ -248,3 +248,36 @@ function rcp_pending_verification_notice() {
 }
 add_action( 'rcp_subscription_details_top', 'rcp_pending_verification_notice' );
 add_action( 'rcp_profile_editor_messages', 'rcp_pending_verification_notice' );
+
+/**
+ * Display email preview.
+ *
+ * @return void
+ */
+function rcp_display_email_template_preview() {
+
+	if ( empty( $_GET['rcp_action'] ) ) {
+		return;
+	}
+
+	if ( 'preview_email' !== $_GET['rcp_action'] ) {
+		return;
+	}
+
+	if ( ! current_user_can( 'rcp_manage_settings' ) ) {
+		return;
+	}
+
+	global $rcp_options;
+
+	$email_type        = ! empty( $_GET['rcp_email'] ) ? $_GET['rcp_email'] : 'active_email';
+	$emails            = new RCP_Emails();
+	$emails->member_id = get_current_user_id();
+	$message           = isset( $rcp_options[ $email_type ] ) ? $rcp_options[ $email_type ] : $rcp_options['active_email'];
+
+	echo $emails->generate_preview( $message );
+
+	exit;
+
+}
+add_action( 'template_redirect', 'rcp_display_email_template_preview' );
