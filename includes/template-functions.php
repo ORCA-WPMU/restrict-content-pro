@@ -256,11 +256,7 @@ add_action( 'rcp_profile_editor_messages', 'rcp_pending_verification_notice' );
  */
 function rcp_display_email_template_preview() {
 
-	if ( empty( $_GET['rcp_action'] ) ) {
-		return;
-	}
-
-	if ( 'preview_email' !== $_GET['rcp_action'] ) {
+	if ( empty( $_GET['rcp_preview_email'] ) ) {
 		return;
 	}
 
@@ -270,7 +266,7 @@ function rcp_display_email_template_preview() {
 
 	global $rcp_options;
 
-	$email_type        = ! empty( $_GET['rcp_email'] ) ? $_GET['rcp_email'] : 'active_email';
+	$email_type        = $_GET['rcp_preview_email'];
 	$emails            = new RCP_Emails();
 	$emails->member_id = get_current_user_id();
 	$message           = isset( $rcp_options[ $email_type ] ) ? $rcp_options[ $email_type ] : $rcp_options['active_email'];

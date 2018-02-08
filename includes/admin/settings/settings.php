@@ -871,7 +871,7 @@ function rcp_settings_page() {
 									?>
 									<p class="description"><?php _e( 'This is the email message that is sent to users when their subscription becomes active.', 'rcp' ); ?></p>
 									<p>
-										<a href="<?php echo esc_url( add_query_arg( array( 'rcp_action' => 'preview_email', 'rcp_email' => 'active_email' ), home_url() ) ); ?>" class="button-secondary" target="_blank"><?php _e( 'Preview Email', 'rcp' ); ?></a>
+										<a href="<?php echo esc_url( add_query_arg( array( 'rcp_preview_email' => 'active_email' ), home_url() ) ); ?>" class="button-secondary" target="_blank"><?php _e( 'Preview Email', 'rcp' ); ?></a>
 										<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=rcp-settings&rcp-action=send_test_email&email=active' ), 'rcp_send_test_email' ) ); ?>" class="button-secondary"><?php _e( 'Send Test Email', 'rcp' ); ?></a>
 									</p>
 								</td>
