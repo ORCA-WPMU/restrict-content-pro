@@ -256,7 +256,7 @@ add_action( 'rcp_profile_editor_messages', 'rcp_pending_verification_notice' );
  */
 function rcp_display_email_template_preview() {
 
-	if ( empty( $_GET['rcp_preview_email'] ) ) {
+	if ( ! isset( $_GET['rcp_preview_email'] ) ) {
 		return;
 	}
 
@@ -269,7 +269,16 @@ function rcp_display_email_template_preview() {
 	$email_type        = $_GET['rcp_preview_email'];
 	$emails            = new RCP_Emails();
 	$emails->member_id = get_current_user_id();
-	$message           = isset( $rcp_options[ $email_type ] ) ? $rcp_options[ $email_type ] : $rcp_options['active_email'];
+
+	if ( is_numeric( $email_type ) ) {
+		// This is an expiration/reminder notice.
+		$reminders = new RCP_Reminders();
+		$notice    = $reminders->get_notice( $email_type );
+		$message   = $notice['message'];
+	} else {
+		// This is a regular email template.
+		$message = isset( $rcp_options[ $email_type ] ) ? $rcp_options[ $email_type ] : $rcp_options['active_email'];
+	}
 
 	echo $emails->generate_preview( $message );
 
